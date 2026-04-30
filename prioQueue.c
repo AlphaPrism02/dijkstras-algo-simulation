@@ -8,33 +8,34 @@ typedef struct PriorityQueue{
     struct PriorityQueue *next;
 }PriorityQueue;
 
+PriorityQueue** createPriorityQueue();
 void addItem(int,PriorityQueue**);
 int removeItem(int,PriorityQueue**);
 int popItem(PriorityQueue**);
+int peekItem(PriorityQueue);
 void displayQueue(PriorityQueue);
 
 void main(){
-    PriorityQueue *n1 = malloc(sizeof(PriorityQueue));
-    PriorityQueue *n2 = malloc(sizeof(PriorityQueue));
-    PriorityQueue *n3 = malloc(sizeof(PriorityQueue));
-    PriorityQueue *n4 = malloc(sizeof(PriorityQueue));
-    PriorityQueue *n5 = malloc(sizeof(PriorityQueue));
+    PriorityQueue **prioQueue=createPriorityQueue();
 
-    n1->item = 1; n1->next = n2;
-    n2->item = 2; n2->next = n3;
-    n3->item = 6; n3->next = n4;
-    n4->item = 7; n4->next = n5;
-    n5->item = 8; n5->next = NULL;
+    addItem(4,prioQueue);
+    addItem(3,prioQueue);
+    addItem(0,prioQueue);
+    addItem(10,prioQueue);
 
-    addItem(4,&n1);
-    addItem(3,&n1);
-    addItem(0,&n1);
-    addItem(10,&n1);
+    int del=removeItem(0,prioQueue);
+    //int popped=popItem(prioQueue);
 
-    int del=removeItem(0,&n1);
-    //int popped=popItem(&n1);
+    displayQueue(**prioQueue);
+}
 
-    displayQueue(*n1);
+PriorityQueue** createPriorityQueue(){
+    PriorityQueue **prioQueue=malloc(sizeof(PriorityQueue*));
+    PriorityQueue *n1=malloc(sizeof(PriorityQueue));
+    n1->item=INT_MIN;
+    n1->next=NULL;
+    *prioQueue=n1;
+    return prioQueue;
 }
 
 void addItem(int item,PriorityQueue **prioQueue){
@@ -107,6 +108,10 @@ int popItem(PriorityQueue **prioQueue){
     *prioQueue=popped->next;
     free(popped);
     return item;
+}
+
+int peekItem(PriorityQueue prioQueue){
+    return prioQueue.item;
 }
 
 void displayQueue(PriorityQueue prioQueue){
