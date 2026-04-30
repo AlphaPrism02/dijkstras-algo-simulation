@@ -9,7 +9,7 @@ typedef struct PriorityQueue{
 }PriorityQueue;
 
 void addItem(int,PriorityQueue**);
-int removeItem(int,PriorityQueue*);
+int removeItem(int,PriorityQueue**);
 int popItem(PriorityQueue**);
 void displayQueue(PriorityQueue);
 
@@ -31,7 +31,7 @@ void main(){
     addItem(0,&n1);
     addItem(10,&n1);
 
-    int del=removeItem(3,n1);
+    int del=removeItem(0,&n1);
     //int popped=popItem(&n1);
 
     displayQueue(*n1);
@@ -69,17 +69,18 @@ void addItem(int item,PriorityQueue **prioQueue){
     }
 }
 
-int removeItem(int item,PriorityQueue *prioQueue){
-    if(prioQueue->item==INT_MIN){
+int removeItem(int item,PriorityQueue **prioQueue){
+    if((*prioQueue)->item==INT_MIN){
         printf("empty");
         return INT_MIN;
     }
 
-    PriorityQueue *currItem=prioQueue;
+    PriorityQueue *currItem=*prioQueue;
     PriorityQueue *prev=NULL,*next=NULL;
 
     if(currItem->item==item){
-        currItem=currItem->next;
+        *prioQueue=currItem->next;
+        return item;
     }
 
     while(currItem->next!=NULL){
