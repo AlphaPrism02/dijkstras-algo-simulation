@@ -10,6 +10,7 @@ typedef struct PriorityQueue{
 
 void addItem(int,PriorityQueue**);
 int removeItem(int,PriorityQueue*);
+int popItem(PriorityQueue**);
 void displayQueue(PriorityQueue);
 
 void main(){
@@ -31,6 +32,7 @@ void main(){
     addItem(10,&n1);
 
     int del=removeItem(3,n1);
+    //int popped=popItem(&n1);
 
     displayQueue(*n1);
 }
@@ -69,23 +71,41 @@ void addItem(int item,PriorityQueue **prioQueue){
 
 int removeItem(int item,PriorityQueue *prioQueue){
     if(prioQueue->item==INT_MIN){
+        printf("empty");
         return INT_MIN;
     }
-    else{
-        PriorityQueue *currItem=prioQueue;
-        PriorityQueue *prev=NULL,*next=NULL;
-        while(currItem->next!=NULL){
-            prev=currItem;
-            next=currItem->next->next;
-            if(currItem->next->item==item){
-                prev->next=next;
-                return item;
-            }
-            currItem=currItem->next;
-        }
 
-        return INT_MAX;
+    PriorityQueue *currItem=prioQueue;
+    PriorityQueue *prev=NULL,*next=NULL;
+
+    if(currItem->item==item){
+        currItem=currItem->next;
     }
+
+    while(currItem->next!=NULL){
+        prev=currItem;
+        next=currItem->next->next;
+        if(currItem->next->item==item){
+            prev->next=next;
+            return item;
+        }
+        currItem=currItem->next;
+    }
+
+    printf("not found");
+    return INT_MAX;
+}
+
+int popItem(PriorityQueue **prioQueue){
+    if((*prioQueue)->item==INT_MIN){
+        printf("Queue is empty");
+        return INT_MIN;
+    }
+    PriorityQueue *popped=*prioQueue;
+    int item=popped->item;
+    *prioQueue=popped->next;
+    free(popped);
+    return item;
 }
 
 void displayQueue(PriorityQueue prioQueue){
