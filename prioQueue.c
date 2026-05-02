@@ -3,23 +3,28 @@
 #include <stdbool.h>
 #include <limits.h>
 
-typedef struct PriorityQueue{
+typedef struct Node{
     int item;
-    struct PriorityQueue *next;
+    struct Node *next;
+}Node;
+
+typedef struct{
+    Node *head;
+    int len;
 }PriorityQueue;
 
-PriorityQueue** createPriorityQueue();
-bool emptyQueue(PriorityQueue**);
-void addItem(int,PriorityQueue**);
-int removeItem(int,PriorityQueue**);
-int popItem(PriorityQueue**);
-int peekItem(PriorityQueue);
-bool containsItem(int,PriorityQueue);
-void displayQueue(PriorityQueue);
-void clearQueue(PriorityQueue**);
+PriorityQueue* createPriorityQueue();
+bool emptyQueue(PriorityQueue*);
+void addItem(int,PriorityQueue*);
+int removeItem(int,PriorityQueue*);
+int popItem(PriorityQueue*);
+int peekItem(PriorityQueue*);
+bool containsItem(int,PriorityQueue*);
+void displayQueue(PriorityQueue*);
+void clearQueue(PriorityQueue*);
 
 void main(){
-    PriorityQueue **prioQueue=createPriorityQueue();
+    PriorityQueue *prioQueue=createPriorityQueue();
     
     printf("%s",emptyQueue(prioQueue) ? "true" : "false");
 
@@ -33,152 +38,174 @@ void main(){
     addItem(5,prioQueue);
     addItem(8,prioQueue);
 
-    displayQueue(**prioQueue);
+    displayQueue(prioQueue);
     
-    int del=removeItem(0,prioQueue);
+    int del=removeItem(4,prioQueue);
     int popped=popItem(prioQueue);
 
-    printf("%d",peekItem(**prioQueue));
+    printf("%d",peekItem(prioQueue));
 
-    printf("%s",containsItem(10,**prioQueue) ? "true" : "false");
+    printf("%s",containsItem(10,prioQueue) ? "true" : "false");
 
-    displayQueue(**prioQueue);
+    displayQueue(prioQueue);
 
     clearQueue(prioQueue);
-    displayQueue(**prioQueue);
+    displayQueue(prioQueue);
 }
 
-PriorityQueue** createPriorityQueue(){
-    PriorityQueue **prioQueue=malloc(sizeof(PriorityQueue*));
-    PriorityQueue *n1=malloc(sizeof(PriorityQueue));
-    n1->item=INT_MIN;
-    n1->next=NULL;
-    *prioQueue=n1;
+PriorityQueue* createPriorityQueue(){
+    PriorityQueue *prioQueue=malloc(sizeof(PriorityQueue));
+    prioQueue->head=NULL;
+    prioQueue->len=0;
     return prioQueue;
 }
 
-bool emptyQueue(PriorityQueue **prioQueue){
-    if(prioQueue==NULL){
-        return true;
-    }
-    if((*prioQueue)->item==INT_MIN){
+bool emptyQueue(PriorityQueue *prioQueue){
+    if(prioQueue->head==NULL){
         return true;
     }
     return false;
 }
 
-void addItem(int item,PriorityQueue **prioQueue){
+void addItem(int item,PriorityQueue *prioQueue){
     if(emptyQueue(prioQueue)){
-        (*prioQueue)->item=item;
-        (*prioQueue)->next=NULL;
+        prioQueue->head=malloc(sizeof(Node));
+        prioQueue->head->item=item;
+        prioQueue->head->next=NULL;
+
+        prioQueue->len++;
+        return;
     }
-    else if((*prioQueue)->item>item){
-        PriorityQueue *currItem=malloc(sizeof(PriorityQueue));
-        currItem->item=item; 
-        currItem->next=*prioQueue;
-        *prioQueue=currItem;
+    if(prioQueue->head->item>item){
+        Node *currNode=malloc(sizeof(Node));
+        currNode->item=item; 
+        currNode->next=prioQueue->head;
+        prioQueue->head=currNode;
+
+        prioQueue->len++;
+        return;
     }
-    else{
-        PriorityQueue *currItem=*prioQueue;
-        PriorityQueue *prev=NULL,*next=NULL;
-        while(currItem->next!=NULL){
-            if(currItem->next->item>item){
-                prev=currItem;
-                next=currItem->next;
-                currItem->next=malloc(sizeof(PriorityQueue));
-                currItem->next->item=item;
-                currItem=currItem->next;
-                currItem->next=next;
-                return;
-            }
-            currItem=currItem->next;
+
+    Node *currNode=prioQueue->head;
+    Node *next=NULL;
+    while(currNode->next!=NULL){
+        if(currNode->next->item>item){
+            next=currNode->next;
+            currNode->next=malloc(sizeof(Node));
+            currNode->next->item=item;
+            currNode=currNode->next;
+            currNode->next=next;
+
+            prioQueue->len++;
+            return;
         }
-        currItem->next=malloc(sizeof(PriorityQueue));
-        currItem->next->item=item;
-        currItem->next->next=NULL;
+        currNode=currNode->next;
     }
+    currNode->next=malloc(sizeof(Node));
+    currNode->next->item=item;
+    currNode->next->next=NULL;
+    prioQueue->len++;
 }
 
-int removeItem(int item,PriorityQueue **prioQueue){
+int removeItem(int item,PriorityQueue *prioQueue){
     if(emptyQueue(prioQueue)){
         printf("empty");
         return INT_MIN;
     }
 
-    PriorityQueue *currItem=*prioQueue;
-    PriorityQueue *prev=NULL,*next=NULL;
+    Node *currNode=prioQueue->head;
+    Node *next=NULL;
 
-    if(currItem->item==item){
-        *prioQueue=currItem->next;
+    if(currNode->item==item){
+        prioQueue->head=currNode->next;
+        prioQueue->len--;
+
+        free(currNode);
         return item;
     }
 
-    while(currItem->next!=NULL){
-        prev=currItem;
-        next=currItem->next->next;
-        if(currItem->next->item==item){
-            prev->next=next;
+    while(currNode->next!=NULL){
+        next=currNode->next->next;
+        if(currNode->next->item==item){
+            Node *toFree=currNode->next;
+            currNode->next=next;
+            prioQueue->len--;
+
+            free(toFree);
             return item;
         }
-        currItem=currItem->next;
+        currNode=currNode->next;
     }
 
     printf("not found");
     return INT_MAX;
 }
 
-int popItem(PriorityQueue **prioQueue){
+int popItem(PriorityQueue *prioQueue){
     if(emptyQueue(prioQueue)){
         printf("Queue is empty");
         return INT_MIN;
     }
-    PriorityQueue *popped=*prioQueue;
+
+    Node *popped=prioQueue->head;
     int item=popped->item;
-    *prioQueue=popped->next;
+    prioQueue->head=popped->next;
+    prioQueue->len--;
+
     free(popped);
     return item;
 }
 
-int peekItem(PriorityQueue prioQueue){
-    if(prioQueue.item==INT_MIN){
+int peekItem(PriorityQueue *prioQueue){
+    if(emptyQueue(prioQueue)){
         printf("Queue is empty\n");
         return INT_MIN;
     }
 
-    return prioQueue.item;
+    return prioQueue->head->item;
 }
 
-bool containsItem(int item,PriorityQueue prioQueue){
-    if(prioQueue.item==INT_MIN){
+bool containsItem(int item,PriorityQueue *prioQueue){
+    if(emptyQueue(prioQueue)){
         return false;
     }
 
-    while(prioQueue.next!=NULL){
-        if(prioQueue.item==item){
+    Node node=*(prioQueue->head);
+    while(node.next!=NULL){
+        if(node.item==item){
             return true;
         }
-        prioQueue=*(prioQueue.next);
+        node=*(node.next);
     }
-    if(prioQueue.item==item){
+    if(node.item==item){
         return true;
     }
+
     return false;
 }
 
-void displayQueue(PriorityQueue prioQueue){
-    if(prioQueue.item==INT_MIN){
+void displayQueue(PriorityQueue *prioQueue){
+    if(emptyQueue(prioQueue)){
         printf("Queue is empty\n");
         return;
     }
+
+    Node node=*(prioQueue->head);
     
-    while(prioQueue.next!=NULL){
-        printf("%d ",prioQueue.item);
-        prioQueue=*(prioQueue.next);
+    while(node.next!=NULL){
+        printf("%d ",node.item);
+        node=*(node.next);
     }
-    printf("%d\n",prioQueue.item);
+    printf("%d\n",node.item);
 }
 
-void clearQueue(PriorityQueue **prioQueue){
-    (*prioQueue)->item=INT_MIN;
-    (*prioQueue)->next=NULL;
+void clearQueue(PriorityQueue *prioQueue){
+    Node *curr = prioQueue->head;
+    while(curr){
+        Node *tmp = curr->next;
+        free(curr);
+        curr = tmp;
+    }
+    prioQueue->head = NULL;
+    prioQueue->len  = 0;
 }
