@@ -38,7 +38,7 @@ int pathfinder(int grid[11][11],int depth,int x,int y)
         if(x==10 && y==10) //reached end
         {
             bestPath=(depth<bestPath)?depth:bestPath;
-            return --depth;
+            return depth;
         }
 
         if(y+1 < 11 && grid[x][y+1] == 0){depth=pathfinder(grid,depth+1,x,y+1);}
