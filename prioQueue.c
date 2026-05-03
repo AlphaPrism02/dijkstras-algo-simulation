@@ -23,7 +23,7 @@ bool containsItem(int,PriorityQueue*);
 void displayQueue(PriorityQueue*);
 void clearQueue(PriorityQueue*);
 
-void main(){
+int main(){
     PriorityQueue *prioQueue=createPriorityQueue();
     
     printf("%s",emptyQueue(prioQueue) ? "true" : "false");
@@ -51,6 +51,8 @@ void main(){
 
     clearQueue(prioQueue);
     displayQueue(prioQueue);
+
+    return 1;
 }
 
 PriorityQueue* createPriorityQueue(){
