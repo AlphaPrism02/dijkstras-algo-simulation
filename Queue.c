@@ -28,7 +28,7 @@ void display(Queue*);
 void clearQueue(Queue*);
 
 
-int main(){
+int queueTest(){
     Queue *queue=createQueue(2);
 
     printf("%s",emptyQueue(queue) ? "true" : "false");
